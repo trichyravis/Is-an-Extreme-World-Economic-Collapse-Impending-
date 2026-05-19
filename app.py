@@ -151,6 +151,95 @@ section[data-testid="stSidebar"] input::placeholder {{
 }}
 section[data-testid="stSidebar"] input {{ caret-color: {NAVY_DEEP}; }}
 
+/* --- Sidebar expander headers (Global settings, Current indicator readings, etc.)
+       Default + hover + focus states all preserved in high-contrast gold/cream. --- */
+section[data-testid="stSidebar"] details > summary,
+section[data-testid="stSidebar"] [data-testid="stExpander"] summary,
+section[data-testid="stSidebar"] .streamlit-expanderHeader,
+section[data-testid="stSidebar"] [data-testid="stExpander"] > details > summary,
+section[data-testid="stSidebar"] [data-testid="stExpander"] [role="button"] {{
+    color: {GOLD} !important;
+    -webkit-text-fill-color: {GOLD} !important;
+    background-color: rgba(255,255,255,0.04) !important;
+    font-weight: 600;
+    font-family: 'Playfair Display', Georgia, serif !important;
+    letter-spacing: 0.01em;
+    border-radius: 6px;
+}}
+section[data-testid="stSidebar"] details > summary *,
+section[data-testid="stSidebar"] [data-testid="stExpander"] summary *,
+section[data-testid="stSidebar"] .streamlit-expanderHeader * {{
+    color: {GOLD} !important;
+    -webkit-text-fill-color: {GOLD} !important;
+}}
+section[data-testid="stSidebar"] details > summary:hover,
+section[data-testid="stSidebar"] [data-testid="stExpander"] summary:hover,
+section[data-testid="stSidebar"] .streamlit-expanderHeader:hover,
+section[data-testid="stSidebar"] [data-testid="stExpander"] [role="button"]:hover {{
+    color: {PARCHMENT} !important;
+    -webkit-text-fill-color: {PARCHMENT} !important;
+    background-color: rgba(201,169,97,0.18) !important;
+}}
+section[data-testid="stSidebar"] details > summary:hover *,
+section[data-testid="stSidebar"] [data-testid="stExpander"] summary:hover *,
+section[data-testid="stSidebar"] .streamlit-expanderHeader:hover * {{
+    color: {PARCHMENT} !important;
+    -webkit-text-fill-color: {PARCHMENT} !important;
+}}
+/* Expander chevron icon */
+section[data-testid="stSidebar"] [data-testid="stExpanderToggleIcon"] svg,
+section[data-testid="stSidebar"] details summary svg {{
+    fill: {GOLD} !important;
+    color: {GOLD} !important;
+}}
+section[data-testid="stSidebar"] details > summary:hover svg,
+section[data-testid="stSidebar"] .streamlit-expanderHeader:hover svg {{
+    fill: {PARCHMENT} !important;
+    color: {PARCHMENT} !important;
+}}
+
+/* --- Slider labels + the current-value bubble above the thumb --- */
+section[data-testid="stSidebar"] [data-testid="stWidgetLabel"],
+section[data-testid="stSidebar"] [data-testid="stWidgetLabel"] *,
+section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] label * {{
+    color: #EFE7D2 !important;
+    -webkit-text-fill-color: #EFE7D2 !important;
+    font-weight: 500;
+}}
+section[data-testid="stSidebar"] [data-baseweb="slider"] [data-testid="stThumbValue"],
+section[data-testid="stSidebar"] [data-baseweb="slider"] [data-testid="stThumbValue"] *,
+section[data-testid="stSidebar"] [data-baseweb="tooltip"],
+section[data-testid="stSidebar"] [data-baseweb="tooltip"] * {{
+    color: {NAVY_DEEP} !important;
+    -webkit-text-fill-color: {NAVY_DEEP} !important;
+    background-color: {GOLD} !important;
+    font-weight: 600;
+    border-radius: 4px;
+}}
+/* Slider min/max tick labels */
+section[data-testid="stSidebar"] [data-baseweb="slider"] [data-testid="stTickBar"] *,
+section[data-testid="stSidebar"] [data-baseweb="slider"] [data-testid="stTickBarMin"],
+section[data-testid="stSidebar"] [data-baseweb="slider"] [data-testid="stTickBarMax"] {{
+    color: rgba(239,231,210,0.7) !important;
+    -webkit-text-fill-color: rgba(239,231,210,0.7) !important;
+    font-size: 0.72rem;
+}}
+
+/* --- Markdown / captions / strong text inside the sidebar --- */
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] li,
+section[data-testid="stSidebar"] .stMarkdown,
+section[data-testid="stSidebar"] .stMarkdown * {{
+    color: #EFE7D2 !important;
+    -webkit-text-fill-color: #EFE7D2 !important;
+}}
+section[data-testid="stSidebar"] strong,
+section[data-testid="stSidebar"] b {{
+    color: {GOLD} !important;
+    -webkit-text-fill-color: {GOLD} !important;
+}}
+
 /* Tabs */
 .stTabs [data-baseweb="tab-list"] {{
     gap: 0.25rem;
