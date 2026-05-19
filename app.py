@@ -1,3 +1,4 @@
+
 """
 Macro Risk Dashboard — Streamlit app
 ====================================
@@ -44,23 +45,270 @@ from openpyxl.formatting.rule import ColorScaleRule
 
 
 # ===========================================================================
-# Page config
+# Page config — Mountain Path Academy aesthetic
 # ===========================================================================
 st.set_page_config(
-    page_title="Macro Risk Dashboard",
-    page_icon="📉",
+    page_title="Macro Risk Dashboard · The Mountain Path Academy",
+    page_icon="⛰️",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-ACCENT = "#1F4E79"
+# ---------- Brand palette ----------
+NAVY        = "#1B3A5B"   # primary — mountain twilight
+NAVY_DEEP   = "#0F2540"   # peak shadow, for headings
+GOLD        = "#C9A961"   # sunrise gold, accent
+GOLD_DARK   = "#A8893F"   # hover / line accent
+PARCHMENT   = "#FAF7F1"   # page background
+PARCHMENT_2 = "#F2EAD3"   # secondary background
+CHARCOAL    = "#2C3E50"   # body text
+SLATE       = "#5D6D7E"   # muted text
+MOUNTAIN_GREEN = "#5B7C5A"  # subtle eco accent
+ALERT_RED   = "#A33B2A"   # crisis / drawdown
+ALERT_AMBER = "#D08B2C"   # stress
+
+# Backward-compatible name used by older chart code
+ACCENT = NAVY
+
+# ---------- Custom CSS ----------
+_CSS = f"""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+html, body, [class*="css"], .stApp {{
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    color: {CHARCOAL};
+}}
+.stApp {{
+    background: {PARCHMENT};
+}}
+h1, h2, h3, h4 {{
+    font-family: 'Playfair Display', Georgia, serif !important;
+    color: {NAVY_DEEP} !important;
+    letter-spacing: -0.01em;
+}}
+h1 {{ font-weight: 700; }}
+h2, h3 {{ font-weight: 600; }}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {{
+    background: linear-gradient(180deg, {NAVY_DEEP} 0%, {NAVY} 100%);
+}}
+section[data-testid="stSidebar"] * {{ color: #EFE7D2 !important; }}
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3 {{
+    color: {GOLD} !important;
+    font-family: 'Playfair Display', Georgia, serif !important;
+}}
+section[data-testid="stSidebar"] [data-baseweb="slider"] [role="slider"] {{
+    background-color: {GOLD} !important;
+}}
+section[data-testid="stSidebar"] .stExpander {{
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,169,97,0.18);
+    border-radius: 8px;
+}}
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {{
+    gap: 0.25rem;
+    border-bottom: 2px solid {GOLD};
+}}
+.stTabs [data-baseweb="tab"] {{
+    background: transparent;
+    color: {SLATE};
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+}}
+.stTabs [aria-selected="true"] {{
+    color: {NAVY_DEEP} !important;
+    border-bottom: 3px solid {GOLD} !important;
+    font-weight: 600;
+}}
+
+/* Metrics */
+[data-testid="stMetric"] {{
+    background: #FFFFFF;
+    border: 1px solid {PARCHMENT_2};
+    border-left: 4px solid {GOLD};
+    border-radius: 6px;
+    padding: 1rem 1.2rem;
+    box-shadow: 0 1px 2px rgba(15,37,64,0.04);
+}}
+[data-testid="stMetricLabel"] {{
+    color: {SLATE} !important;
+    font-size: 0.78rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+}}
+[data-testid="stMetricValue"] {{
+    color: {NAVY_DEEP} !important;
+    font-family: 'Playfair Display', Georgia, serif !important;
+    font-weight: 700;
+}}
+
+/* Buttons */
+.stDownloadButton button, .stButton button {{
+    background: {NAVY} !important;
+    color: {PARCHMENT} !important;
+    border: 1px solid {GOLD} !important;
+    font-weight: 600;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+}}
+.stDownloadButton button:hover, .stButton button:hover {{
+    background: {GOLD} !important;
+    color: {NAVY_DEEP} !important;
+    border-color: {GOLD_DARK} !important;
+}}
+
+/* Brand header strip */
+.mpa-header {{
+    background: linear-gradient(135deg, {NAVY_DEEP} 0%, {NAVY} 60%, {NAVY_DEEP} 100%);
+    border-bottom: 3px solid {GOLD};
+    padding: 1.4rem 1.6rem 1.2rem;
+    margin: -1rem -1rem 1.4rem -1rem;
+    color: {PARCHMENT};
+    border-radius: 0 0 6px 6px;
+}}
+.mpa-header .eyebrow {{
+    color: {GOLD};
+    font-family: 'Inter', sans-serif;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-weight: 600;
+}}
+.mpa-header h1 {{
+    color: {PARCHMENT} !important;
+    margin: 0.2rem 0 0.2rem;
+    font-size: 2.1rem;
+    line-height: 1.15;
+}}
+.mpa-header .sub {{
+    color: {GOLD};
+    font-style: italic;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.05rem;
+}}
+.mpa-header .by {{
+    color: rgba(255,255,255,0.65);
+    font-size: 0.82rem;
+    margin-top: 0.35rem;
+}}
+
+/* Sidebar profile card */
+.mpa-profile {{
+    text-align: center;
+    padding: 0.8rem 0.4rem 0.4rem;
+    border-bottom: 1px solid rgba(201,169,97,0.3);
+    margin-bottom: 0.6rem;
+}}
+.mpa-profile .name {{
+    color: {GOLD} !important;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+}}
+.mpa-profile .tagline {{
+    color: rgba(239,231,210,0.75) !important;
+    font-size: 0.78rem;
+    font-style: italic;
+    margin-bottom: 0.6rem;
+}}
+.mpa-profile a {{
+    display: inline-block;
+    margin: 0 0.35rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid {GOLD};
+    border-radius: 4px;
+    text-decoration: none !important;
+    font-size: 0.78rem;
+    color: {GOLD} !important;
+    transition: all 0.15s ease;
+}}
+.mpa-profile a:hover {{
+    background: {GOLD};
+    color: {NAVY_DEEP} !important;
+}}
+
+/* Footer */
+.mpa-footer {{
+    margin-top: 2rem;
+    padding: 1.4rem 1rem 1rem;
+    border-top: 2px solid {GOLD};
+    background: {PARCHMENT_2};
+    border-radius: 6px;
+    text-align: center;
+    color: {CHARCOAL};
+}}
+.mpa-footer .col {{
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 1.4rem;
+    text-align: left;
+}}
+.mpa-footer h4 {{
+    color: {NAVY_DEEP} !important;
+    margin: 0 0 0.4rem;
+    font-size: 0.95rem;
+    font-family: 'Playfair Display', Georgia, serif !important;
+}}
+.mpa-footer a {{
+    color: {NAVY} !important;
+    text-decoration: none;
+    font-weight: 500;
+}}
+.mpa-footer a:hover {{ color: {GOLD_DARK} !important; }}
+.mpa-footer .disclaimer {{
+    color: {SLATE};
+    font-size: 0.78rem;
+    font-style: italic;
+    margin-top: 1rem;
+}}
+
+/* Dataframes — softer borders */
+[data-testid="stDataFrame"] {{
+    border: 1px solid {PARCHMENT_2};
+    border-radius: 4px;
+}}
+
+/* Expander header */
+.streamlit-expanderHeader {{
+    font-weight: 600;
+    color: {NAVY_DEEP};
+}}
+
+/* Hide Streamlit chrome */
+#MainMenu {{ visibility: hidden; }}
+footer {{ visibility: hidden; }}
+header[data-testid="stHeader"] {{ background: transparent; }}
+</style>
+"""
+st.markdown(_CSS, unsafe_allow_html=True)
+
+# ---------- Matplotlib theme to match ----------
 plt.rcParams.update({
     "figure.figsize": (10, 6),
-    "axes.spines.top": False,
+    "figure.facecolor": PARCHMENT,
+    "axes.facecolor":   "#FFFFFF",
+    "axes.edgecolor":   SLATE,
+    "axes.labelcolor":  CHARCOAL,
+    "axes.titlecolor":  NAVY_DEEP,
+    "axes.titleweight": "bold",
+    "axes.titlesize":   12,
+    "axes.spines.top":   False,
     "axes.spines.right": False,
-    "axes.grid": True,
-    "grid.alpha": 0.3,
-    "font.size": 11,
+    "axes.grid":         True,
+    "grid.color":        PARCHMENT_2,
+    "grid.alpha":        0.7,
+    "xtick.color":       SLATE,
+    "ytick.color":       SLATE,
+    "font.family":       "DejaVu Sans",  # Inter not bundled w/ matplotlib
+    "font.size":         11,
+    "legend.frameon":    False,
 })
 
 
@@ -345,11 +593,13 @@ def scenario_outcome(shocks: dict, baseline_growth: float = 3.1) -> dict:
 # ===========================================================================
 def fig_sri(sri: pd.DataFrame):
     fig, ax = plt.subplots(figsize=(10, 4.5))
-    ax.plot(sri.index, sri["sri_equal"], label="SRI (equal weight)", lw=2, color=ACCENT)
-    ax.plot(sri.index, sri["sri_pca"], label="SRI (PCA)", lw=2, alpha=0.85, color="#E89B1B")
-    for y, label, color in [(25, "Calm", "#7CB342"),
-                            (50, "Watch", "#FFB300"),
-                            (75, "Stress", "#E64A19")]:
+    ax.plot(sri.index, sri["sri_equal"], label="SRI (equal weight)",
+            lw=2, color=NAVY)
+    ax.plot(sri.index, sri["sri_pca"],   label="SRI (PCA)",
+            lw=2, alpha=0.9, color=GOLD)
+    for y, label, color in [(25, "Calm",   MOUNTAIN_GREEN),
+                            (50, "Watch",  ALERT_AMBER),
+                            (75, "Stress", ALERT_RED)]:
         ax.axhline(y, color=color, ls="--", lw=1, alpha=0.7)
         ax.text(sri.index[3], y + 1, label, color=color, fontsize=9)
     ax.set_title("Composite Systemic Risk Index — 1996 to 2026")
@@ -363,13 +613,13 @@ def fig_sri(sri: pd.DataFrame):
 def fig_zscores(z_now: pd.Series):
     fig, ax = plt.subplots(figsize=(10, 4.5))
     z = z_now.reindex(INDICATORS)
-    colors = ["#C0392B" if v > 1.5 else ("#E89B1B" if v > 0 else "#1F4E79") for v in z]
-    ax.barh(range(len(z)), z.values, color=colors)
+    colors = [ALERT_RED if v > 1.5 else (GOLD if v > 0 else NAVY) for v in z]
+    ax.barh(range(len(z)), z.values, color=colors, edgecolor=NAVY_DEEP, linewidth=0.4)
     ax.set_yticks(range(len(z)))
     ax.set_yticklabels([INDICATOR_LABELS[i] for i in z.index])
-    ax.axvline(0, color="black", lw=0.8)
-    ax.axvline(1, color="#FFB300", ls="--", lw=1, alpha=0.7)
-    ax.axvline(2, color="#E64A19", ls="--", lw=1, alpha=0.7)
+    ax.axvline(0, color=NAVY_DEEP, lw=0.8)
+    ax.axvline(1, color=ALERT_AMBER, ls="--", lw=1, alpha=0.7)
+    ax.axvline(2, color=ALERT_RED,   ls="--", lw=1, alpha=0.7)
     ax.set_xlabel("Z-score vs 30y history")
     ax.set_title("Current indicator z-scores")
     ax.invert_yaxis()
@@ -381,7 +631,7 @@ def fig_debt_fan(results, countries):
     fig, axes = plt.subplots(1, len(countries), figsize=(16, 4.5), sharey=False)
     if len(countries) == 1:
         axes = [axes]
-    colors = {"Base": "#1F4E79", "Adverse": "#E89B1B", "Severely Adverse": "#C0392B"}
+    colors = {"Base": NAVY, "Adverse": GOLD, "Severely Adverse": ALERT_RED}
     for ax, c in zip(axes, countries):
         for sname, color in colors.items():
             path = results[c.name][sname]["path"]
@@ -398,12 +648,12 @@ def fig_debt_fan(results, countries):
 def fig_mc(mc):
     g = mc["growth"]
     fig, ax = plt.subplots(figsize=(10, 4.5))
-    ax.hist(g, bins=60, color=ACCENT, alpha=0.85, edgecolor="white")
-    ax.axvline(mc["var95"], color="#C0392B", ls="--", lw=2,
+    ax.hist(g, bins=60, color=NAVY, alpha=0.88, edgecolor=PARCHMENT)
+    ax.axvline(mc["var95"], color=ALERT_RED, ls="--", lw=2,
                label=f"VaR 95%: {mc['var95']:.2f}%")
-    ax.axvline(mc["cvar95"], color="#E64A19", ls="--", lw=2,
+    ax.axvline(mc["cvar95"], color=GOLD_DARK, ls="--", lw=2,
                label=f"CVaR 95%: {mc['cvar95']:.2f}%")
-    ax.axvline(0, color="black", ls=":", lw=1.5, label="Recession line")
+    ax.axvline(0, color=NAVY_DEEP, ls=":", lw=1.5, label="Recession line")
     ax.set_title(f"Monte Carlo 1y global growth (n={mc['n_paths']:,})")
     ax.set_xlabel("Global growth, next 12 months (%)")
     ax.set_ylabel("Count")
@@ -418,20 +668,22 @@ def fig_scenarios(scen_results: dict):
     infls   = [scen_results[s]["inflation_1y"] for s in labels]
     dds     = [scen_results[s]["equity_dd_1y"] for s in labels]
     fig, axes = plt.subplots(1, 3, figsize=(15, 4.2))
-    colors = ["#1F4E79", "#E89B1B", "#C0392B"]
+    colors = [NAVY, GOLD, ALERT_RED]
     for ax, vals, title, ylabel in zip(
         axes,
         [growths, infls, dds],
         ["1y growth", "1y inflation", "Equity drawdown"],
         ["%", "%", "%"],
     ):
-        ax.bar(labels, vals, color=colors[: len(labels)])
+        ax.bar(labels, vals, color=colors[: len(labels)],
+               edgecolor=NAVY_DEEP, linewidth=0.5)
         ax.set_title(title)
         ax.set_ylabel(ylabel)
         ax.tick_params(axis="x", rotation=15)
         for i, v in enumerate(vals):
             ax.text(i, v, f"{v:+.1f}", ha="center",
-                    va="bottom" if v >= 0 else "top", fontsize=10)
+                    va="bottom" if v >= 0 else "top",
+                    fontsize=10, color=NAVY_DEEP, fontweight="bold")
     fig.tight_layout()
     return fig
 
@@ -563,10 +815,29 @@ def build_excel_bytes(summary: dict) -> bytes:
 
 
 # ===========================================================================
-# Sidebar — controls
+# Sidebar — branded header + controls
 # ===========================================================================
-st.sidebar.markdown(f"## :chart_with_downwards_trend: Macro Risk")
-st.sidebar.caption("Interactive companion to the May 2026 briefing.")
+LINKEDIN_URL = "https://www.linkedin.com/in/trichyravis"
+GITHUB_URL   = "https://github.com/trichyravis/"
+ACADEMY_URL  = "https://themountainpathacademy.com"
+
+st.sidebar.markdown(
+    f"""
+    <div class="mpa-profile">
+        <div style="font-size:1.8rem;line-height:1">⛰</div>
+        <div class="name">The Mountain Path</div>
+        <div class="tagline">Finance · Risk · Modelling</div>
+        <a href="{LINKEDIN_URL}" target="_blank">in · LinkedIn</a>
+        <a href="{GITHUB_URL}" target="_blank">⌥ GitHub</a>
+        <div style="margin-top:0.5rem">
+            <a href="{ACADEMY_URL}" target="_blank">⛰ Academy</a>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+st.sidebar.markdown("### Macro Risk Controls")
+st.sidebar.caption("Adjust any input; the dashboard recomputes live.")
 
 with st.sidebar.expander("Global settings", expanded=True):
     seed = st.number_input("Random seed", value=20260519, step=1)
@@ -647,12 +918,17 @@ regime = sri["regime"].iloc[-1]
 
 
 # ===========================================================================
-# Header
+# Branded header
 # ===========================================================================
 st.markdown(
-    f"<h1 style='color:{ACCENT};margin-bottom:0'>Macro Risk Dashboard</h1>"
-    f"<p style='color:#595959;margin-top:4px'>Interactive model — adjust any input"
-    f" in the sidebar and outputs recompute live.</p>",
+    f"""
+    <div class="mpa-header">
+        <div class="eyebrow">The Mountain Path Academy · Macro Risk Lab</div>
+        <h1>Is an Extreme World Economic Collapse Impending?</h1>
+        <div class="sub">A practitioner-led macro risk dashboard — debt, growth, energy, geopolitics.</div>
+        <div class="by">Interactive companion to the May 2026 briefing · Adjust any input in the sidebar to recompute live.</div>
+    </div>
+    """,
     unsafe_allow_html=True,
 )
 
@@ -867,9 +1143,33 @@ with tab_dl:
         st.json(summary)
 
 
-st.markdown("---")
-st.caption(
-    "Illustrative model — calibrated to the May 2026 briefing. "
-    "Replace `synth_history()` with real IMF / World Bank / FRED pulls to productionise. "
-    "Not investment advice."
+st.markdown(
+    f"""
+    <div class="mpa-footer">
+        <div class="col">
+            <h4>The Mountain Path Academy</h4>
+            <a href="{ACADEMY_URL}" target="_blank">themountainpathacademy.com</a><br>
+            <span style="color:{SLATE};font-size:0.85rem">Practitioner-led courses in financial<br>
+            modelling, risk, derivatives & valuation</span>
+        </div>
+        <div class="col">
+            <h4>Connect</h4>
+            <a href="{LINKEDIN_URL}" target="_blank">LinkedIn → trichyravis</a><br>
+            <a href="{GITHUB_URL}" target="_blank">GitHub → trichyravis</a>
+        </div>
+        <div class="col">
+            <h4>Methodology</h4>
+            <span style="color:{SLATE};font-size:0.85rem">
+            9-indicator composite SRI · debt sustainability<br>
+            simulation · 10k-path Gaussian copula MC · scenarios
+            </span>
+        </div>
+        <div class="disclaimer">
+            Illustrative model — calibrated to the May 2026 briefing. Replace
+            <code>synth_history()</code> with real IMF / World Bank / FRED pulls to productionise.
+            Not investment advice. © {2026} V. Ravichandran · The Mountain Path Academy.
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
 )
