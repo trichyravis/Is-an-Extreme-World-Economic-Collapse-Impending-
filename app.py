@@ -110,6 +110,47 @@ section[data-testid="stSidebar"] .stExpander {{
     border-radius: 8px;
 }}
 
+/* --- Sidebar inputs: dark navy text on white field, gold accents --- */
+section[data-testid="stSidebar"] input,
+section[data-testid="stSidebar"] textarea,
+section[data-testid="stSidebar"] [data-baseweb="input"] input,
+section[data-testid="stSidebar"] [data-baseweb="select"] input,
+section[data-testid="stSidebar"] [data-baseweb="select"] div,
+section[data-testid="stSidebar"] [data-baseweb="select"] span,
+section[data-testid="stSidebar"] [data-baseweb="input"] *,
+section[data-testid="stSidebar"] [data-testid="stNumberInput"] input,
+section[data-testid="stSidebar"] [data-testid="stTextInput"] input,
+section[data-testid="stSidebar"] [data-testid="stSelectbox"] * {{
+    color: {NAVY_DEEP} !important;
+    font-weight: 500;
+    -webkit-text-fill-color: {NAVY_DEEP} !important;  /* Safari/Chrome override */
+    background-color: #FFFFFF !important;
+}}
+/* Slider current-value chip + caption — keep these readable on dark bg */
+section[data-testid="stSidebar"] [data-baseweb="slider"] [data-testid="stTickBarMin"],
+section[data-testid="stSidebar"] [data-baseweb="slider"] [data-testid="stTickBarMax"] {{
+    color: {GOLD} !important;
+    -webkit-text-fill-color: {GOLD} !important;
+    background: transparent !important;
+}}
+/* Number-input +/- step buttons */
+section[data-testid="stSidebar"] [data-testid="stNumberInput"] button {{
+    color: {NAVY_DEEP} !important;
+    -webkit-text-fill-color: {NAVY_DEEP} !important;
+    background-color: {PARCHMENT_2} !important;
+    border-color: {GOLD} !important;
+}}
+section[data-testid="stSidebar"] [data-testid="stNumberInput"] button:hover {{
+    background-color: {GOLD} !important;
+    color: {NAVY_DEEP} !important;
+}}
+/* Caret + placeholder colour */
+section[data-testid="stSidebar"] input::placeholder {{
+    color: {SLATE} !important;
+    -webkit-text-fill-color: {SLATE} !important;
+}}
+section[data-testid="stSidebar"] input {{ caret-color: {NAVY_DEEP}; }}
+
 /* Tabs */
 .stTabs [data-baseweb="tab-list"] {{
     gap: 0.25rem;
